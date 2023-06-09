@@ -70,6 +70,11 @@ RAYLIB_PHYSFS_DEF Shader LoadShaderFromPhysFS(const char* vsFileName, const char
 RAYLIB_PHYSFS_DEF void SetPhysFSCallbacks();                                      // Set the raylib file loader/saver callbacks to use PhysFS
 RAYLIB_PHYSFS_DEF const char* GetPerfDirectory(const char *organization, const char *application); // Get the user's current config directory for the application.
 
+#if defined(__vita__)
+#define PHYSFS_BASEDIR "app0:/"
+#else
+#define PHYSFS_BASEDIR ""
+#endif
 #ifdef __cplusplus
 }
 #endif
@@ -87,11 +92,6 @@ RAYLIB_PHYSFS_DEF const char* GetPerfDirectory(const char *organization, const c
 #include "physfs.h"
 
 
-#if defined(__vita__)
-#define PHYSFS_BASEDIR "app0:/"
-#else
-#define PHYSFS_BASEDIR "./"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -230,9 +230,7 @@ bool IsPhysFSReady() {
  * @see UnmountPhysFS()
  */
 bool MountPhysFS(const char* newDir, const char* mountPoint) {
-    char realDir[256];
-    sprintf(realDir, "%s%s", PHYSFS_BASEDIR, newDir);
-    if (PHYSFS_mount(realDir, mountPoint, 1) == 0) {
+    if (PHYSFS_mount(newDir, mountPoint, 1) == 0) {
         TracePhysFSError(mountPoint);
         return false;
     }
