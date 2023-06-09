@@ -86,6 +86,13 @@ RAYLIB_PHYSFS_DEF const char* GetPerfDirectory(const char *organization, const c
 #define PHYSFS_DECL RAYLIB_PHYSFS_DEF
 #include "physfs.h"
 
+
+#if defined(__vita__)
+#define PHYSFS_BASEDIR "app0:/"
+#else
+#define PHYSFS_BASEDIR "./"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -223,7 +230,9 @@ bool IsPhysFSReady() {
  * @see UnmountPhysFS()
  */
 bool MountPhysFS(const char* newDir, const char* mountPoint) {
-    if (PHYSFS_mount(newDir, mountPoint, 1) == 0) {
+    char realDir[256];
+    sprintf(realDir, "%s%s", PHYSFS_BASEDIR, newDir);
+    if (PHYSFS_mount(realDir, mountPoint, 1) == 0) {
         TracePhysFSError(mountPoint);
         return false;
     }
